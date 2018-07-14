@@ -95,8 +95,9 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
+  const title = document.createElement('p');
   title.innerHTML = 'Reviews';
+  title.className = 'review';
   container.appendChild(title);
 
   if (!reviews) {
@@ -117,16 +118,26 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
-  const name = document.createElement('p');
+  const reviewHead = document.createElement('div');
+  reviewHead.className = 'review-head';
+  const name = document.createElement('div');
   name.innerHTML = review.name;
-  li.appendChild(name);
-
-  const date = document.createElement('p');
+  name.className = 'reviewer-name';
+  reviewHead.appendChild(name);
+  
+  const date = document.createElement('div');
   date.innerHTML = review.date;
-  li.appendChild(date);
+  date.className = 'review-date';
+  reviewHead.appendChild(date);
+  
+  li.appendChild(reviewHead);
 
   const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}`;
+  const spanRate = document.createElement('span');
+  spanRate.innerHTML = `Rating: ${review.rating}`;
+  spanRate.className = 'review-rate';
+  rating.appendChild(spanRate);
+  rating.align = 'left';
   li.appendChild(rating);
 
   const comments = document.createElement('p');
@@ -139,7 +150,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
