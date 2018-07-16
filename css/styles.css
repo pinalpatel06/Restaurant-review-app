@@ -82,6 +82,7 @@ h6 {
   font-family: Arial, Helvetica, sans-serif;
   margin: 10px;
   padding: 5px;
+  font-size: 20px;
 }
 
 article,
@@ -128,15 +129,16 @@ section {
 
 nav {
   width: 100%;
-  height: 80px;
+  height: 100%;
   background-color: #252831;
-  text-align: center;
-  padding: 1%;
+  /* text-align: center; */
+  /* padding: 1%; */
 }
 
 nav h1 {
   margin: auto;
   text-transform: uppercase;
+  text-align: center;
 }
 
 nav h1 a {
@@ -299,7 +301,7 @@ div.filter-options {
 #restaurant-name {
   color: #FF6600;
   font-family: Arial, sans-serif;
-  font-size: 30px;
+  font-size: 20px;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -310,8 +312,8 @@ div.filter-options {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 2%;
-  max-height: 100%;
-  height: auto;
+  max-width: 80%;
+  height: 90%;
 }
 
 #restaurant-img-full {
@@ -328,10 +330,10 @@ div.filter-options {
 #restaurant-cuisine {
   background-color: #333;
   color: #FF6600;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 300;
   letter-spacing: 1px;
-  padding: 20px;
+  padding: 10px;
   text-align: left;
   text-transform: uppercase;
   width: 100%;
@@ -600,7 +602,7 @@ p.review_text {
   h1 {
     color: white;
     font-size: 25pt;
-    letter-spacing: 14px;
+    /* letter-spacing: 14px; */
   }
   /* #restaurant-name, */
   #restaurant-cuisine,
