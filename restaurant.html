@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <!-- Normalize.css for better cross-browser consistency -->
@@ -15,7 +15,7 @@
   <!-- Beginning header -->
   <header>
     <!-- Beginning nav -->
-    <nav>
+    <nav aria-label="Breadcrumb">
       <h1>
         <a href="/">Restaurant Reviews</a>
       </h1>
@@ -38,7 +38,7 @@
   <main id="maincontent">
     <!-- Beginning map -->
     <section id="map-container">
-      <div id="map" role="google-map"></div>
+      <div id="map" role="application" aria-label="google-map"></div>
     </section>
     <!-- End map -->
     <!-- Beginning restaurant -->
@@ -46,7 +46,7 @@
       <h3 id="restaurant-name"></h3>
 
       <div id="restaurant-img-full">
-        <img id="restaurant-img" alt="restaurant image is shown here. It shows how its ambience.">
+        <img id="restaurant-img">
       </div>
 
       <p id="restaurant-cuisine"></p>
