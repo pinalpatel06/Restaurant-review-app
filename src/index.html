@@ -45,6 +45,32 @@
     <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
     <script sync defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEy49s6wvoeq1UjdZzGFP-excpZM1yx04&libraries=places&callback=initMap"></script>
 
+    <footer id="footer">
+      Copyright (c) 2017
+      <a href="/">
+        <strong>Restaurant Reviews</strong>
+      </a> All Rights Reserved.
+    </footer>
+  </div>
+</body>
+
+</html>
+
+<!-- Register service worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('serviceworker.js')
+      .then(function (registration) {
+        console.log('Service Worker registration successful with scope: ',
+          registration.scope);
+      })
+      .catch(function (err) {
+        console.log('Service Worker registration failed: ', err);
+      });
+  }
+</script>
+
+
 
     <footer id="footer">
       Copyright (c) 2017
