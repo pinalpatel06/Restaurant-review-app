@@ -1,21 +1,22 @@
 {
-  "name": "restaurant-review-app",
+  "name": "mws-restaurant-stage-1",
   "version": "1.0.0",
-  "description": "Three Stage Course Material Project - Restaurant Reviews_",
+  "description": "Restaurant Project for Udacity Moble Web Specialist course.",
   "main": "index.html",
   "scripts": {
+    "start": "gulp buildAll; cd build; python -m SimpleHTTPServer",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pinalpatel06/Restaurant-review-app.git"
+    "url": "git+https://github.com/steve-christensen/mws-restaurant-stage-1.git"
   },
-  "author": "Pinal Takodia",
+  "author": "Steve Christensen",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/pinalpatel06/Restaurant-review-app/issues"
+    "url": "https://github.com/steve-christensen/mws-restaurant-stage-1/issues"
   },
-  "homepage": "https://github.com/pinalpatel06/Restaurant-review-app#readme",
+  "homepage": "https://github.com/steve-christensen/mws-restaurant-stage-1#readme",
   "dependencies": {
     "grunt": "^1.0.3",
     "grunt-contrib-clean": "^1.1.0",

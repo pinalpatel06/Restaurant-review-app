@@ -1,46 +1,52 @@
-let restaurant;
-var map;
+/*
+ * 2018-06-15
+ *  - Add code for alt attributes on images. Use image_desc if available.
+ *    If not, use restaruant name.
+ */
+
+import { DBHelper } from '../lib/dbhelper.js';
+
+const restaurantDB = new DBHelper();
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize map as soon as the page is loaded.
  */
-window.initMap = () => {
-  fetchRestaurantFromURL((error, restaurant) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-    }
-  });
-}
+document.addEventListener('DOMContentLoaded', (event) => {
+  initMap();
+});
 
 /**
- * Get current restaurant from page URL.
+ * Initialize leaflet map
  */
-fetchRestaurantFromURL = (callback) => {
-  if (self.restaurant) { // restaurant already fetched!
-    callback(null, self.restaurant)
-    return;
-  }
+const initMap = () => {
   const id = getParameterByName('id');
-  if (!id) { // no id found in URL
-    error = 'No restaurant id in URL'
-    callback(error, null);
-  } else {
-    DBHelper.fetchRestaurantById(id, (error, restaurant) => {
-      self.restaurant = restaurant;
-      if (!restaurant) {
-        console.error(error);
-        return;
-      }
-      fillRestaurantHTML();
-      callback(null, restaurant)
+
+  if (!id) {
+    console.log('No restaurant id in URL');
+  }
+  else {
+    restaurantDB.fetchRestaurantById(id).then(restaurant => {
+      fillRestaurantHTML(restaurant);
+
+      self.newMap = L.map('map', {
+        center: [restaurant.latlng.lat, restaurant.latlng.lng],
+        zoom: 16,
+        scrollWheelZoom: false
+      });
+      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+        mapboxToken: 'pk.eyJ1Ijoic2RjcnVubmVyIiwiYSI6ImNqaWJyZXp5dTB4bWozbHM2YjZrdW43MjMifQ.EowtKHnQ02BnpcwWvnJNWA',
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+          '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+          'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+      }).addTo(self.newMap);
+
+      fillBreadcrumb(restaurant);
+      DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
+
+      // Take map attributions out of tab sequence
+      removeMapAttributionsFromTabOrder();
     });
   }
 }
@@ -48,33 +54,58 @@ fetchRestaurantFromURL = (callback) => {
 /**
  * Create restaurant HTML and add it to the webpage
  */
-fillRestaurantHTML = (restaurant = self.restaurant) => {
+const fillRestaurantHTML = (restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
+  const imageURL = DBHelper.imageUrlForRestaurant(restaurant);
+
+  const imageMd = document.getElementById('restaurant-img-md');
+  imageMd.setAttribute('srcset', imageURL.replace('.jpg','-560_md.jpg'));
+
+  const imageLg = document.getElementById('restaurant-img-lg');
+  imageLg.setAttribute('srcset', imageURL.replace('.jpg','-800_lg.jpg'));
+
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = `${restaurant.name} restaurant image is shown here. It shows how its ambience.`;
+  image.src = imageURL.replace('.jpg','-320_sm.jpg');
+
+  // Add an alt attribute for images. Use "image_desc" if available, if not use
+  // restaurant name.
+  image.alt = restaurant.image_desc ? restaurant.image_desc : restaurant.name;
+
+  const fig = document.querySelector('figure');
+  const figCaption = document.createElement('figcaption');
+  figCaption.innerHTML =  restaurant.image_desc ? restaurant.image_desc : restaurant.name;
+  fig.append(figCaption);
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
 
   // fill operating hours
   if (restaurant.operating_hours) {
-    fillRestaurantHoursHTML();
+    fillRestaurantHoursHTML(restaurant.operating_hours);
   }
   // fill reviews
-  fillReviewsHTML();
+  fillReviewsHTML(restaurant.reviews);
+}
+
+/**
+ * Don't include map attributions in the tab sequence
+ */
+const removeMapAttributionsFromTabOrder = () => {
+  const linkList = document.querySelectorAll(".leaflet-control-attribution a");
+  linkList.forEach(link => {
+    link.setAttribute('tabindex', '-1');
+  })
 }
 
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
  */
-fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
+const fillRestaurantHoursHTML = (operatingHours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
     const row = document.createElement('tr');
@@ -94,11 +125,10 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h3');
+  const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
-  title.className = 'review';
   container.appendChild(title);
 
   if (!reviews) {
@@ -117,32 +147,37 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 /**
  * Create review HTML and add it to the webpage.
  */
-createReviewHTML = (review) => {
+const createReviewHTML = (review) => {
   const li = document.createElement('li');
-  const reviewHead = document.createElement('div');
-  reviewHead.className = 'review-head';
-  const name = document.createElement('div');
+  const name = document.createElement('p');
   name.innerHTML = review.name;
-  name.className = 'reviewer-name';
-  reviewHead.appendChild(name);
-  
-  const date = document.createElement('div');
+  name.className = 'reviewer';
+  li.appendChild(name);
+
+  const date = document.createElement('p');
   date.innerHTML = review.date;
-  date.className = 'review-date';
-  reviewHead.appendChild(date);
-  
-  li.appendChild(reviewHead);
+  date.className = 'review-date'
+  li.appendChild(date);
 
   const rating = document.createElement('p');
-  const spanRate = document.createElement('span');
-  spanRate.innerHTML = `Rating: ${review.rating}`;
-  spanRate.className = 'review-rate';
-  rating.appendChild(spanRate);
-  rating.align = 'left';
+  if (Number.isInteger(review.rating) && 0 < review.rating && review.rating < 6) {
+    const offscreenRating = document.createElement('p');
+    offscreenRating.className = 'rating-offscreen';
+    offscreenRating.innerHTML = 'Rating: ' + review.rating + ' stars';
+    li.appendChild(offscreenRating);
+
+    rating.setAttribute('rating', review.rating);
+  }
+  else {
+    rating.innerHTML = 'unrated';
+    rating.setAttribute('rating', 'invalid');
+  }
   li.appendChild(rating);
+
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
+  comments.className = 'review-text';
   li.appendChild(comments);
 
   return li;
@@ -151,7 +186,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant = self.restaurant) => {
+const fillBreadcrumb = (restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
@@ -161,7 +196,7 @@ fillBreadcrumb = (restaurant = self.restaurant) => {
 /**
  * Get a parameter by name from page URL.
  */
-getParameterByName = (name, url) => {
+const getParameterByName = (name, url) => {
   if (!url)
     url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
