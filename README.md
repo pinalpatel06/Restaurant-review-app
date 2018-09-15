@@ -38,7 +38,7 @@ Install dependencies:
 To build and serve with Python SimpleHTTPServer, enter the following command:
 
   ```
-  nmp start
+  npm start
   ```
 
 By default, the application will be served at http://localhost:8000/
