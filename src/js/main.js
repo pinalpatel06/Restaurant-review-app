@@ -1,9 +1,3 @@
-/*
- * 2018-06-15
- *  - Add code for alt attributes on images. Use image_desc if available.
- *    If not, use restaruant name.
- */
-
 import { DBHelper } from '../lib/dbhelper.js';
 
 let newMap;
@@ -18,8 +12,6 @@ const mapAvailable = L;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap(); // added
-//  fetchNeighborhoods();
-//  fetchCuisines();
 // Just call the DBHelper methods directly as wrapping them in a function
 // in this instance does not add value
   restaurantDB.fetchNeighborhoods().then(neighborhoods => fillNeighborhoodsHTML(neighborhoods));
@@ -27,18 +19,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 /**
- * Fetch all neighborhoods and set their HTML.
- */
-/* Wrapping the DBHelper calls in a function does not add value
-const fetchNeighborhoods = () => {
-  restaurantDB.fetchNeighborhoods().then(neighborhoods => fillNeighborhoodsHTML(neighborhoods));
-}
-*/
-
-/**
  * Set neighborhoods HTML.
  */
-//const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 const fillNeighborhoodsHTML = (neighborhoods) => {
   const select = document.getElementById('neighborhoods-select');
   neighborhoods.forEach((neighborhood, idx) => {
@@ -53,18 +35,8 @@ const fillNeighborhoodsHTML = (neighborhoods) => {
 }
 
 /**
- * Fetch all cuisines and set their HTML.
- */
- /* Wrapping the DBHelper call in a function does not add value
-const fetchCuisines = () => {
-  restaurantDB.fetchCuisines().then(cuisines => fillCuisinesHTML(cuisines));
-}
-*/
-
-/**
  * Set cuisines HTML.
  */
-//const fillCuisinesHTML = (cuisines = self.cuisines) => {
 const fillCuisinesHTML = (cuisines) => {
   const select = document.getElementById('cuisines-select');
 
@@ -100,28 +72,12 @@ const initMap = () => {
   newMap = self.newMap;
 
   updateRestaurants();
-/*  else {
-    document.getElementById()
-  }
-*/
 }
-/* window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
-  updateRestaurants();
-} */
+
 
 /**
  * Update page and map for current restaurants.
  */
-//const updateRestaurants = () => {
 const updateRestaurants = () => {
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
@@ -224,7 +180,6 @@ const createRestaurantHTML = (restaurant) => {
 /**
  * Add markers for current restaurants to the map.
  */
-//const addMarkersToMap = (restaurants = self.restaurants) => {
 const addMarkersToMap = () => {
   self.restaurants.forEach(restaurant => {
     // Add marker to the map
@@ -236,16 +191,6 @@ const addMarkersToMap = () => {
     self.markers.push(marker);
   });
 }
-/* addMarkersToMap = (restaurants = self.restaurants) => {
-  restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-    google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
-    });
-    self.markers.push(marker);
-  });
-} */
 
 // Expose updateRestaurants for use in window events
 window.updateRestaurants = updateRestaurants;
