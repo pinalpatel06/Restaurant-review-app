@@ -7,21 +7,7 @@
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.min.js', { scope: location.path }).then(function (registration) {
 
-        var serviceWorker;
-        if (registration.installing) {
-            serviceWorker = registration.installing;
-        } else if (registration.waiting) {
-            serviceWorker = registration.waiting;
-        } else if (registration.active) {
-            serviceWorker = registration.active;
-        }
-
-        if (serviceWorker) {
-            console.log('ServiceWorker state: ' + serviceWorker.state);
-            serviceWorker.addEventListener('statechange', function (e) {
-                console.log('ServiceWorker state: ' + serviceWorker.state);
-            });
-        }
+     
     }).catch(function (error) {
         console.log('ServiceWorker registration failed: ' + error);
     });
